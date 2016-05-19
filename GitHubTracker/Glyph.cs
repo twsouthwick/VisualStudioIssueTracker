@@ -15,25 +15,25 @@ using System.Windows.Shapes;
 namespace GitHubTracker
 {
     [Export(typeof(IGlyphFactoryProvider))]
-    [Name("TodoGlyph")]
+    [Name("GitHubGlyph")]
     [Order(After = "VsTextMarker")]
     [ContentType("code")]
-    [TagType(typeof(TodoTag))]
-    internal sealed class TodoGlyphFactoryProvider : IGlyphFactoryProvider
+    [TagType(typeof(GitHubTag))]
+    internal sealed class GitHubGlyphFactoryProvider : IGlyphFactoryProvider
     {
         public IGlyphFactory GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)
         {
-            return new TodoGlyphFactory();
+            return new GitHubGlyphFactory();
         }
 
-        private class TodoGlyphFactory : IGlyphFactory
+        private class GitHubGlyphFactory : IGlyphFactory
         {
             const double m_glyphSize = 16.0;
 
             public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
             {
                 // Ensure we can draw a glyph for this marker.
-                if (tag == null || !(tag is TodoTag))
+                if (tag == null || !(tag is GitHubTag))
                 {
                     return null;
                 }
@@ -48,9 +48,9 @@ namespace GitHubTracker
         }
     }
 
-    internal class TodoTag : IGlyphTag
+    internal class GitHubTag : IGlyphTag
     {
-        public TodoTag(string organization, string repo, int issue)
+        public GitHubTag(string organization, string repo, int issue)
         {
             Organization = organization;
             Repo = repo;
@@ -64,18 +64,18 @@ namespace GitHubTracker
         public int Issue { get; }
     }
 
-    internal class TodoTagger : ITagger<TodoTag>
+    internal class GitHubTagger : ITagger<GitHubTag>
     {
         private static readonly Regex s_regex = new Regex(@"GitHub\W+(\w+)/(\w+)\W+(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private IClassifier _classifier;
 
-        public TodoTagger(IClassifier classifier)
+        public GitHubTagger(IClassifier classifier)
         {
             _classifier = classifier;
         }
 
-        public IEnumerable<ITagSpan<TodoTag>> GetTags(NormalizedSnapshotSpanCollection spans)
+        public IEnumerable<ITagSpan<GitHubTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             foreach (SnapshotSpan span in spans)
             {
@@ -88,7 +88,9 @@ namespace GitHubTracker
 
                         foreach (Match match in matches)
                         {
-                            yield return new TagSpan<TodoTag>(new SnapshotSpan(classification.Span.Start + match.Index, match.Value.Length), new TodoTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value)));
+                            yield return new TagSpan<GitHubTag>(
+                                new SnapshotSpan(classification.Span.Start + match.Index, match.Value.Length),
+                                new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value)));
                         }
                     }
                 }
@@ -100,8 +102,8 @@ namespace GitHubTracker
 
     [Export(typeof(ITaggerProvider))]
     [ContentType("code")]
-    [TagType(typeof(TodoTag))]
-    internal class TodoTaggerProvider : ITaggerProvider
+    [TagType(typeof(GitHubTag))]
+    internal class GitHubTaggerProvider : ITaggerProvider
     {
         [Import]
         public IClassifierAggregatorService AggregatorService { get; set; }
@@ -113,8 +115,7 @@ namespace GitHubTracker
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            return new TodoTagger(AggregatorService.GetClassifier(buffer)) as ITagger<T>;
+            return new GitHubTagger(AggregatorService.GetClassifier(buffer)) as ITagger<T>;
         }
     }
-
 }
