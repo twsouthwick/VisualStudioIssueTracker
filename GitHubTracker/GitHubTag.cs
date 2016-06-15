@@ -66,6 +66,7 @@ namespace GitHubTracker
 
                 if (!result.IsSuccessStatusCode)
                 {
+                    Debugger.Break();
                     return string.Empty;
                 }
 
