@@ -12,10 +12,12 @@ namespace GitHubTracker
         private static readonly Regex s_regex = new Regex(@"GitHub\W+(\w+)/(\w+)\W+(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private IClassifier _classifier;
+        private GitHubHttpClient _client;
 
-        public GitHubTagger(IClassifier classifier)
+        public GitHubTagger(IClassifier classifier, GitHubHttpClient client)
         {
             _classifier = classifier;
+            _client = client;
         }
 
         public IEnumerable<ITagSpan<GitHubTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -33,7 +35,7 @@ namespace GitHubTracker
                         {
                             yield return new TagSpan<GitHubTag>(
                                 new SnapshotSpan(classification.Span.Start + match.Index, match.Value.Length),
-                                new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value)));
+                                new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value), _client));
                         }
                     }
                 }

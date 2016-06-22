@@ -13,6 +13,9 @@ namespace GitHubTracker
     internal class GitHubTaggerProvider : ITaggerProvider
     {
         [Import]
+        public GitHubHttpClient Client { get; set; }
+
+        [Import]
         public IClassifierAggregatorService AggregatorService { get; set; }
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer)
@@ -23,7 +26,7 @@ namespace GitHubTracker
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            return new GitHubTagger(AggregatorService.GetClassifier(buffer)) as ITagger<T>;
+            return new GitHubTagger(AggregatorService.GetClassifier(buffer), Client) as ITagger<T>;
         }
     }
 }
