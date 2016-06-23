@@ -2,8 +2,10 @@
 
 namespace GitHubTracker
 {
+    public enum IssueStatus { Open, Closed, All };
+
     public interface IGitHubClient
     {
-        Task<string> GetStatusAsync(string organization, string repo, int issue);
+        Task<IssueStatus> GetStatusAsync(string organization, string repo, int issue);
     }
 }

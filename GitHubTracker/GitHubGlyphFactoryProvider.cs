@@ -2,9 +2,9 @@
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
-using System;
 using System.ComponentModel.Composition;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -36,25 +36,39 @@ namespace GitHubTracker
                     return null;
                 }
 
+                var border = new Border
+                {
+                    Height = m_glyphSize,
+                    Width = m_glyphSize,
+                    BorderThickness = new Thickness(2),
+                    BorderBrush = Brushes.Black
+                };
+
                 var rectangle = new Rectangle
                 {
                     Height = m_glyphSize,
-                    Width = m_glyphSize
+                    Width = m_glyphSize,
                 };
+
+                border.Child = rectangle;
 
                 gitHubTag.Update(t =>
                 {
-                    if (string.Equals("closed", t, StringComparison.Ordinal))
+                    switch (t)
                     {
-                        rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Green);
-                    }
-                    else
-                    {
-                        rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Red);
+                        case IssueStatus.Closed:
+                            rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Green);
+                            break;
+                        case IssueStatus.Open:
+                            rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Red);
+                            break;
+                        case IssueStatus.All:
+                            rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Blue);
+                            break;
                     }
                 });
 
-                return rectangle;
+                return border;
             }
         }
     }

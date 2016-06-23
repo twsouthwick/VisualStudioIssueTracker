@@ -11,7 +11,7 @@ namespace GitHubTracker
         private static readonly JsonSerializer s_serializer = JsonSerializer.CreateDefault();
 
         private readonly IGitHubClient _client;
-        private Task<string> _task;
+        private Task<IssueStatus> _task;
 
         public GitHubTag(string organization, string repo, int issue, IGitHubClient client)
         {
@@ -23,17 +23,7 @@ namespace GitHubTracker
 
             _task = Task.Run(() =>
             {
-                return _client.GetStatusAsync(organization, repo, issue).ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                    {
-                        Debugger.Break();
-
-                        return string.Empty;
-                    }
-
-                    return t.Result;
-                });
+                return _client.GetStatusAsync(organization, repo, issue);
             });
         }
 
@@ -43,7 +33,7 @@ namespace GitHubTracker
 
         public int Issue { get; }
 
-        public void Update(Action<string> action)
+        public void Update(Action<IssueStatus> action)
         {
             Debug.Assert(action != null);
 
