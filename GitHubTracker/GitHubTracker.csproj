@@ -49,6 +49,7 @@
     <Compile Include="GitHubTag.cs" />
     <Compile Include="GitHubTagger.cs" />
     <Compile Include="GitHubTaggerProvider.cs" />
+    <Compile Include="IGitHubClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

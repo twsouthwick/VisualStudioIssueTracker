@@ -12,11 +12,15 @@ namespace GitHubTracker
     [TagType(typeof(GitHubTag))]
     internal class GitHubTaggerProvider : ITaggerProvider
     {
-        [Import]
-        public GitHubHttpClient Client { get; set; }
+        private readonly IGitHubClient _client;
+        private readonly IClassifierAggregatorService _aggregatorService;
 
-        [Import]
-        public IClassifierAggregatorService AggregatorService { get; set; }
+        [ImportingConstructor]
+        public GitHubTaggerProvider(IGitHubClient client, IClassifierAggregatorService aggregatorService)
+        {
+            _aggregatorService = aggregatorService;
+            _client = client;
+        }
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer)
             where T : ITag
@@ -26,7 +30,7 @@ namespace GitHubTracker
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            return new GitHubTagger(AggregatorService.GetClassifier(buffer), Client) as ITagger<T>;
+            return new GitHubTagger(_aggregatorService.GetClassifier(buffer), _client) as ITagger<T>;
         }
     }
 }

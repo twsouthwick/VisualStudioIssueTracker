@@ -12,9 +12,9 @@ namespace GitHubTracker
         private static readonly Regex s_regex = new Regex(@"GitHub\W+(\w+)/(\w+)\W+(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private IClassifier _classifier;
-        private GitHubHttpClient _client;
+        private IGitHubClient _client;
 
-        public GitHubTagger(IClassifier classifier, GitHubHttpClient client)
+        public GitHubTagger(IClassifier classifier, IGitHubClient client)
         {
             _classifier = classifier;
             _client = client;

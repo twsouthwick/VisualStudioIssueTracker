@@ -2,8 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace GitHubTracker
@@ -12,10 +10,10 @@ namespace GitHubTracker
     {
         private static readonly JsonSerializer s_serializer = JsonSerializer.CreateDefault();
 
-        private readonly GitHubHttpClient _client;
+        private readonly IGitHubClient _client;
         private Task<string> _task;
 
-        public GitHubTag(string organization, string repo, int issue, GitHubHttpClient client)
+        public GitHubTag(string organization, string repo, int issue, IGitHubClient client)
         {
             _client = client;
 
@@ -25,7 +23,7 @@ namespace GitHubTracker
 
             _task = Task.Run(() =>
             {
-                return GetStatusAsync().ContinueWith(t =>
+                return _client.GetStatusAsync(organization, repo, issue).ContinueWith(t =>
                 {
                     if (t.IsFaulted)
                     {
@@ -54,33 +52,6 @@ namespace GitHubTracker
                 action(t.Result);
                 return t.Result;
             });
-        }
-
-        private async Task<string> GetStatusAsync()
-        {
-            using (var message = new HttpRequestMessage(HttpMethod.Get, $"repos/{Organization}/{Repo}/issues/{Issue}"))
-            using (var result = await _client.SendAsync(message))
-            {
-                if (!result.IsSuccessStatusCode)
-                {
-                    Debugger.Break();
-                    return string.Empty;
-                }
-
-                using (var content = await result.Content.ReadAsStreamAsync())
-                using (var textReader = new StreamReader(content))
-                using (var reader = new JsonTextReader(textReader))
-                {
-                    var issue = s_serializer.Deserialize<IssueResponse>(reader);
-
-                    return issue.State;
-                }
-            }
-        }
-
-        private class IssueResponse
-        {
-            public string State { get; set; }
         }
     }
 }
