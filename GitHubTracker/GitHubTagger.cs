@@ -42,6 +42,8 @@ namespace GitHubTracker
             }
         }
 
+#pragma warning disable 0067
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+#pragma warning restore 0067
     }
 }
