@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization;
@@ -15,10 +16,9 @@ namespace GitHubTracker
     [Export(typeof(IGitHubClient))]
     internal class GitHubHttpClient : HttpClient, IGitHubClient
     {
-        private static readonly DataContractJsonSerializer s_serializer = new DataContractJsonSerializer(typeof(IssueResponse));
+        private static readonly DataContractJsonSerializer s_serializer = new DataContractJsonSerializer(typeof(GitHubIssueResponse));
 
-        // TODO: Set up a time-dependent cache to eject info after a set period
-        private ConcurrentDictionary<IssueInfo, Task<IssueStatus>> _issues = new ConcurrentDictionary<IssueInfo, Task<IssueStatus>>(new IssueInfoComparer());
+        private readonly ConcurrentDictionary<IssueDetails, IssueStatusCacheItem> _issueCache = new ConcurrentDictionary<IssueDetails, IssueStatusCacheItem>(new IssueDetailsComparer());
 
         public GitHubHttpClient()
         {
@@ -28,36 +28,56 @@ namespace GitHubTracker
 
         public Task<IssueStatus> GetStatusAsync(string organization, string repo, int issue)
         {
-            var info = new IssueInfo
+            var info = new IssueDetails
             {
                 Organization = organization,
                 Repo = repo,
                 Issue = issue
             };
 
-            // TODO: Handle retry for rate-limited value
-            return _issues.GetOrAdd(info, Task.Run(async () => await GetStatusAsync(info)));
+            return GetStatusAsync(info);
         }
 
-        private async Task<IssueStatus> GetStatusAsync(IssueInfo info)
+        private async Task<IssueStatus> GetStatusAsync(IssueDetails info)
         {
             try
             {
                 using (var message = new HttpRequestMessage(HttpMethod.Get, $"repos/{info.Organization}/{info.Repo}/issues/{info.Issue}"))
-                using (var result = await SendAsync(message))
                 {
-                    var limits = new LimitHeaders(result.Headers);
-
-                    if (!result.IsSuccessStatusCode)
+                    IssueStatusCacheItem status;
+                    if (_issueCache.TryGetValue(info, out status))
                     {
-                        return limits.Remaining == 0 ? IssueStatus.RateLimited : IssueStatus.Unavailable;
+                        message.Headers.TryAddWithoutValidation("If-None-Match", status.Headers.ETag);
                     }
 
-                    using (var content = await result.Content.ReadAsStreamAsync())
+                    using (var response = await SendAsync(message))
                     {
-                        var response = (IssueResponse)s_serializer.ReadObject(content);
+                        var headers = new GithubHeaders(response.Headers);
 
-                        return response.GetStatus();
+                        if (response.StatusCode == HttpStatusCode.NotModified)
+                        {
+                            return status.Status;
+                        }
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            return headers.Remaining == 0 ? IssueStatus.RateLimited : IssueStatus.Unavailable;
+                        }
+
+                        using (var content = await response.Content.ReadAsStreamAsync())
+                        {
+                            var issueResponse = (GitHubIssueResponse)s_serializer.ReadObject(content);
+
+                            var item = new IssueStatusCacheItem
+                            {
+                                Headers = headers,
+                                Status = issueResponse.GetStatus()
+                            };
+
+                            _issueCache.AddOrUpdate(info, item, (_, __) => item);
+
+                            return item.Status;
+                        }
                     }
                 }
             }
@@ -68,7 +88,7 @@ namespace GitHubTracker
         }
 
         [DataContract]
-        private class IssueResponse
+        private class GitHubIssueResponse
         {
             [DataMember(Name = "state")]
             public string State { get; set; }
@@ -85,13 +105,15 @@ namespace GitHubTracker
             }
         }
 
-        private struct LimitHeaders
+        [DebuggerDisplay("GitHub: {Remaining}/{Limit}")]
+        private struct GithubHeaders
         {
-            public LimitHeaders(HttpResponseHeaders headers)
+            public GithubHeaders(HttpResponseHeaders headers)
             {
                 Limit = ToLong(GetHeader(headers, "X-RateLimit-Limit"));
                 Remaining = ToLong(GetHeader(headers, "X-RateLimit-Remaining"));
                 Reset = DateTimeOffset.FromUnixTimeSeconds(ToLong(GetHeader(headers, "X-RateLimit-Reset")));
+                ETag = GetHeader(headers, "ETag");
             }
 
             public long Limit { get; }
@@ -99,6 +121,8 @@ namespace GitHubTracker
             public long Remaining { get; }
 
             public DateTimeOffset Reset { get; }
+
+            public string ETag { get; }
 
             private static long ToLong(string value)
             {
@@ -131,23 +155,31 @@ namespace GitHubTracker
             }
         }
 
-        private struct IssueInfo
+        [DebuggerDisplay("{Organization}/{Repo}/{Issue}")]
+        private struct IssueDetails
         {
             public string Organization;
             public string Repo;
             public int Issue;
         }
 
-        private class IssueInfoComparer : IEqualityComparer<IssueInfo>
+        [DebuggerDisplay("{Status}")]
+        private struct IssueStatusCacheItem
         {
-            public bool Equals(IssueInfo x, IssueInfo y)
+            public IssueStatus Status;
+            public GithubHeaders Headers;
+        }
+
+        private class IssueDetailsComparer : IEqualityComparer<IssueDetails>
+        {
+            public bool Equals(IssueDetails x, IssueDetails y)
             {
                 return x.Issue == y.Issue
                     && string.Equals(x.Organization, y.Organization, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(x.Repo, y.Repo, StringComparison.OrdinalIgnoreCase);
             }
 
-            public int GetHashCode(IssueInfo obj)
+            public int GetHashCode(IssueDetails obj)
             {
                 unchecked
                 {
