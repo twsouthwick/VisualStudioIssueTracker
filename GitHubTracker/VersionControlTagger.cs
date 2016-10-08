@@ -1,31 +1,27 @@
 ﻿using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace GitHubTracker
 {
-    internal class GitHubTagger : ITagger<GitHubTag>
+    internal class VersionControlTagger : ITagger<IVersionControlTag>
     {
         private const string Comment = "comment";
 
-        private static readonly Regex s_regex = new Regex(@"GitHub\W+(\w+)/(\w+)\W+(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         private readonly ITextView _textView;
         private readonly ITagAggregator<IClassificationTag> _tags;
-        private readonly IGitHubClient _client;
+        private readonly IVersionControlClassifier[] _classifiers;
 
-        public GitHubTagger(ITextView textView, ITagAggregator<IClassificationTag> tags, IGitHubClient client)
+        public VersionControlTagger(ITextView textView, ITagAggregator<IClassificationTag> tags, IVersionControlClassifier[] classifiers)
         {
             _textView = textView;
             _tags = tags;
-            _client = client;
+            _classifiers = classifiers;
         }
 
-        public IEnumerable<ITagSpan<GitHubTag>> GetTags(NormalizedSnapshotSpanCollection spans)
+        public IEnumerable<ITagSpan<IVersionControlTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             if (spans.Count == 0)
             {
@@ -41,13 +37,13 @@ namespace GitHubTracker
                         foreach (var snapShot in tag.Span.GetSpans(_textView.TextSnapshot))
                         {
                             var text = snapShot.GetText();
-                            var matches = s_regex.Matches(text);
 
-                            foreach (Match match in matches)
+                            foreach (var classifier in _classifiers)
                             {
-                                yield return new TagSpan<GitHubTag>(
-                                    new SnapshotSpan(snapShot.Start + match.Index, match.Value.Length),
-                                    new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value), _client));
+                                foreach(var versionControlTag in classifier.GetTags(text, snapShot))
+                                {
+                                    yield return versionControlTag;
+                                }
                             }
                         }
                     }

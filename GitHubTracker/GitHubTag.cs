@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GitHubTracker
 {
-    internal class GitHubTag : IGlyphTag
+    internal class GitHubTag : IVersionControlTag, IGlyphTag
     {
         private readonly IGitHubClient _client;
         private Task<IssueStatus> _task;

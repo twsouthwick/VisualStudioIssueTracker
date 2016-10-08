@@ -44,11 +44,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="GitHubGlyphFactoryProvider.cs" />
+    <Compile Include="FullGitHubClassifier.cs" />
+    <Compile Include="IVersionControlClassifier.cs" />
+    <Compile Include="IVersionControlTag.cs" />
+    <Compile Include="VersionControlGlyphFactoryProvider.cs" />
     <Compile Include="GitHubHttpClient.cs" />
     <Compile Include="GitHubTag.cs" />
-    <Compile Include="GitHubTagger.cs" />
-    <Compile Include="GitHubTaggerProvider.cs" />
+    <Compile Include="VersionControlTagger.cs" />
+    <Compile Include="VersionControlViewTaggerProvider.cs" />
     <Compile Include="IGitHubClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

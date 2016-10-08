@@ -11,11 +11,11 @@ using System.Windows.Shapes;
 namespace GitHubTracker
 {
     [Export(typeof(IGlyphFactoryProvider))]
-    [Name("GitHubGlyph")]
+    [Name("VersionControlGlyph")]
     [Order(After = "VsTextMarker")]
     [ContentType("code")]
     [TagType(typeof(GitHubTag))]
-    internal sealed class GitHubGlyphFactoryProvider : IGlyphFactoryProvider
+    internal sealed class VersionControlGlyphFactoryProvider : IGlyphFactoryProvider
     {
         public IGlyphFactory GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)
         {
@@ -28,10 +28,10 @@ namespace GitHubTracker
 
             public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
             {
-                var gitHubTag = tag as GitHubTag;
+                var versionControlTag = tag as IVersionControlTag;
 
                 // Ensure we can draw a glyph for this marker.
-                if (gitHubTag == null)
+                if (versionControlTag == null)
                 {
                     return null;
                 }
@@ -52,7 +52,7 @@ namespace GitHubTracker
 
                 border.Child = rectangle;
 
-                gitHubTag.Update(t =>
+                versionControlTag.Update(t =>
                 {
                     rectangle.Dispatcher.Invoke(() =>
                     {
