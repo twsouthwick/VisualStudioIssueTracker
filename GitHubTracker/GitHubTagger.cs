@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using System;
 using System.Collections.Generic;
@@ -9,25 +10,35 @@ namespace GitHubTracker
 {
     internal class GitHubTagger : ITagger<GitHubTag>
     {
+        private const string Comment = "comment";
+
         private static readonly Regex s_regex = new Regex(@"GitHub\W+(\w+)/(\w+)\W+(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private IClassifier _classifier;
-        private IGitHubClient _client;
+        private readonly ITextView _textView;
+        private readonly IClassifier _classifier;
+        private readonly IGitHubClient _client;
 
-        public GitHubTagger(IClassifier classifier, IGitHubClient client)
+        public GitHubTagger(ITextView textView, IClassifier classifier, IGitHubClient client)
         {
+            _textView = textView;
             _classifier = classifier;
             _client = client;
         }
 
         public IEnumerable<ITagSpan<GitHubTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
+            if (spans.Count == 0)
+            {
+                yield break;
+            }
+
             foreach (SnapshotSpan span in spans)
             {
+                var text = span.GetText();
                 //look at each classification span \
                 foreach (ClassificationSpan classification in _classifier.GetClassificationSpans(span))
                 {
-                    if (string.Equals("comment", classification.ClassificationType.Classification, StringComparison.CurrentCultureIgnoreCase))
+                    if (classification.ClassificationType.IsOfType(Comment))
                     {
                         var matches = s_regex.Matches(classification.Span.GetText());
 

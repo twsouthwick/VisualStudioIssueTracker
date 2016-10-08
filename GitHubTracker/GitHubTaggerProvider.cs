@@ -4,33 +4,36 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 using System;
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Text.Editor;
+using System.Collections.Concurrent;
 
 namespace GitHubTracker
 {
-    [Export(typeof(ITaggerProvider))]
+    [Export(typeof(IViewTaggerProvider))]
     [ContentType("code")]
     [TagType(typeof(GitHubTag))]
-    internal class GitHubTaggerProvider : ITaggerProvider
+    internal class GitHubViewTaggerProvider : IViewTaggerProvider
     {
         private readonly IGitHubClient _client;
         private readonly IClassifierAggregatorService _aggregatorService;
 
+        private readonly ConcurrentDictionary<ITextBuffer, GitHubTagger> _taggers = new ConcurrentDictionary<ITextBuffer, GitHubTagger>();
+
         [ImportingConstructor]
-        public GitHubTaggerProvider(IGitHubClient client, IClassifierAggregatorService aggregatorService)
+        public GitHubViewTaggerProvider(IGitHubClient client, IClassifierAggregatorService aggregatorService)
         {
             _aggregatorService = aggregatorService;
             _client = client;
         }
 
-        public ITagger<T> CreateTagger<T>(ITextBuffer buffer)
-            where T : ITag
+        public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag
         {
-            if (buffer == null)
+            if (buffer == null | textView == null)
             {
-                throw new ArgumentNullException(nameof(buffer));
+                return null;
             }
 
-            return new GitHubTagger(_aggregatorService.GetClassifier(buffer), _client) as ITagger<T>;
+            return new GitHubTagger(textView, _aggregatorService.GetClassifier(buffer), _client) as ITagger<T>;
         }
     }
 }
