@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="GitHubIssueTrackerTaylor Southwick.2598c768-4628-4044-b4bf-e262116a3e3b" Version="1.0" Language="en-US" Publisher="Taylor Southwick" />
+    <Identity Id="IssueTrackerTaylor Southwick.2598c768-4628-4044-b4bf-e262116a3e3b" Version="0.1" Language="en-US" Publisher="Taylor Southwick" />
     <DisplayName>Issue Tracker</DisplayName>
-    <Description xml:space="preserve">Adds glyps to the margin to indicate the status of issues embedded within comments</Description>
+    <Description xml:space="preserve">Adds markers to the margin to indicate the status of issues embedded within comments. Currently supports issues from:
+
+- GitHub</Description>
+    <Icon>Preview.png</Icon>
+    <PreviewImage>Preview.png</PreviewImage>
+    <Tags>GitHub, Issues, Bug Tracker</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />
