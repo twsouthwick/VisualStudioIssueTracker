@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Text.Tagging;
 using System;
 using System.Collections.Generic;
 
-namespace GitHubTracker
+namespace IssueTracker
 {
     internal class VersionControlTagger : ITagger<IVersionControlTag>
     {

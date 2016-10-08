@@ -8,13 +8,13 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace GitHubTracker
+namespace IssueTracker
 {
     [Export(typeof(IGlyphFactoryProvider))]
     [Name("VersionControlGlyph")]
     [Order(After = "VsTextMarker")]
     [ContentType("code")]
-    [TagType(typeof(GitHubTag))]
+    [TagType(typeof(Providers.GitHub.GitHubTag))]
     internal sealed class VersionControlGlyphFactoryProvider : IGlyphFactoryProvider
     {
         public IGlyphFactory GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)

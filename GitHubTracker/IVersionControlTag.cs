@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.Text.Editor;
 using System;
 
-namespace GitHubTracker
+namespace IssueTracker
 {
     internal interface IVersionControlTag : IGlyphTag
     {

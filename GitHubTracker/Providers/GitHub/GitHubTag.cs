@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace GitHubTracker
+namespace IssueTracker.Providers.GitHub
 {
     internal class GitHubTag : IVersionControlTag, IGlyphTag
     {

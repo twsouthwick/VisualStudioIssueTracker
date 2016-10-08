@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="GitHubTracker.Taylor Southwick.2598c768-4628-4044-b4bf-e262116a3e3b" Version="1.0" Language="en-US" Publisher="Taylor Southwick" />
-    <DisplayName>GitHubTracker</DisplayName>
-    <Description>Empty VSIX Project.</Description>
+    <Identity Id="GitHubIssueTrackerTaylor Southwick.2598c768-4628-4044-b4bf-e262116a3e3b" Version="1.0" Language="en-US" Publisher="Taylor Southwick" />
+    <DisplayName>Issue Tracker</DisplayName>
+    <Description xml:space="preserve">Adds glyps to the margin to indicate the status of issues embedded within comments</Description>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />

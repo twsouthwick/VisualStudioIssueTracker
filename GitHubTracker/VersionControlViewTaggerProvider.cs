@@ -4,11 +4,11 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 
-namespace GitHubTracker
+namespace IssueTracker
 {
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("code")]
-    [TagType(typeof(GitHubTag))]
+    [TagType(typeof(Providers.GitHub.GitHubTag))]
     internal class VersionControlViewTaggerProvider : IViewTaggerProvider
     {
         private readonly IVersionControlClassifier[] _classifiers;

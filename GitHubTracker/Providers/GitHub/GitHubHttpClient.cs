@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 
-namespace GitHubTracker
+namespace IssueTracker.Providers.GitHub
 {
     [Export(typeof(IGitHubClient))]
     internal class GitHubHttpClient : HttpClient, IGitHubClient

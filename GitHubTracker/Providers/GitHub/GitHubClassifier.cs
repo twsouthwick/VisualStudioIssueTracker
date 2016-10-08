@@ -5,17 +5,17 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 
-namespace GitHubTracker
+namespace IssueTracker.Providers.GitHub
 {
     [Export(typeof(IVersionControlClassifier))]
-    internal class FullGitHubClassifier : IVersionControlClassifier
+    internal class GitHubClassifier : IVersionControlClassifier
     {
         private static readonly Regex s_regex = new Regex(@"GitHub\W+(\w+)/(\w+)\W+(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly IGitHubClient _client;
 
         [ImportingConstructor]
-        public FullGitHubClassifier(IGitHubClient client)
+        public GitHubClassifier(IGitHubClient client)
         {
             _client = client;
         }

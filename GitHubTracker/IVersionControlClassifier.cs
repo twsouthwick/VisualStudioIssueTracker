@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
 using System.Collections.Generic;
 
-namespace GitHubTracker
+namespace IssueTracker
 {
     internal interface IVersionControlClassifier
     {

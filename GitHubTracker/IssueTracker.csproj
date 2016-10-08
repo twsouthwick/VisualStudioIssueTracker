@@ -16,8 +16,8 @@
     <ProjectGuid>{C63AB956-FD50-409A-BA32-2BEF143D40A5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitHubTracker</RootNamespace>
-    <AssemblyName>GitHubTracker</AssemblyName>
+    <RootNamespace>IssueTracker</RootNamespace>
+    <AssemblyName>IssueTracker</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -44,15 +44,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="FullGitHubClassifier.cs" />
+    <Compile Include="IssueStatus.cs" />
+    <Compile Include="Providers\GitHub\GitHubClassifier.cs" />
     <Compile Include="IVersionControlClassifier.cs" />
     <Compile Include="IVersionControlTag.cs" />
     <Compile Include="VersionControlGlyphFactoryProvider.cs" />
-    <Compile Include="GitHubHttpClient.cs" />
-    <Compile Include="GitHubTag.cs" />
+    <Compile Include="Providers\GitHub\GitHubHttpClient.cs" />
+    <Compile Include="Providers\GitHub\GitHubTag.cs" />
     <Compile Include="VersionControlTagger.cs" />
     <Compile Include="VersionControlViewTaggerProvider.cs" />
-    <Compile Include="IGitHubClient.cs" />
+    <Compile Include="Providers\GitHub\IGitHubClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
