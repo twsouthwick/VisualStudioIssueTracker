@@ -1,11 +1,9 @@
-# Issue Tracker
+# Visual Studio Issue Tracker
 
-<!-- Replace this badge with your own-->
-[![Build status](https://ci.appveyor.com/api/projects/status/hv6uyc059rqbc6fj?svg=true)](https://ci.appveyor.com/project/madskristensen/extensibilitytools)
+[![Build status](https://ci.appveyor.com/api/projects/status/lnhe17kmasdk56jx?svg=true)](https://ci.appveyor.com/project/twsouthwick/visualstudioissuetracker)
 
-<!-- Update the VS Gallery link after you upload the VSIX-->
-Download this extension from the [VS Gallery](https://visualstudiogallery.msdn.microsoft.com/[GuidFromGallery])
-or get the [CI build](http://vsixgallery.com/extension/IssueTrackerTaylor Southwick.2598c768-4628-4044-b4bf-e262116a3e3b/).
+Download this extension from the VS Gallery (Comming Soon)
+or get the [CI build](http://vsixgallery.com/extension/IssueTrackerTaylor%20Southwick.2598c768-4628-4044-b4bf-e262116a3e3b/).
 
 ---------------------------------------
 
@@ -18,6 +16,8 @@ See the [change log](CHANGELOG.md) for changes and road map.
 ## Features
 
 - Shows a margin marker for any issues it finds for GitHub
+
+[![Marker example](docs/assets/example.png)]
 
 ## Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)
