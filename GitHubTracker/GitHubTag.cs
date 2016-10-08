@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.Text.Editor;
-using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -8,8 +7,6 @@ namespace GitHubTracker
 {
     internal class GitHubTag : IGlyphTag
     {
-        private static readonly JsonSerializer s_serializer = JsonSerializer.CreateDefault();
-
         private readonly IGitHubClient _client;
         private Task<IssueStatus> _task;
 

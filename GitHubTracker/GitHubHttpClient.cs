@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 
 namespace GitHubTracker
@@ -15,7 +15,7 @@ namespace GitHubTracker
     [Export(typeof(IGitHubClient))]
     internal class GitHubHttpClient : HttpClient, IGitHubClient
     {
-        private static readonly JsonSerializer s_serializer = JsonSerializer.CreateDefault();
+        private static readonly DataContractJsonSerializer s_serializer = new DataContractJsonSerializer(typeof(IssueResponse));
 
         // TODO: Set up a time-dependent cache to eject info after a set period
         private ConcurrentDictionary<IssueInfo, Task<IssueStatus>> _issues = new ConcurrentDictionary<IssueInfo, Task<IssueStatus>>(new IssueInfoComparer());
@@ -54,12 +54,10 @@ namespace GitHubTracker
                     }
 
                     using (var content = await result.Content.ReadAsStreamAsync())
-                    using (var textReader = new StreamReader(content))
-                    using (var reader = new JsonTextReader(textReader))
                     {
-                        var response = s_serializer.Deserialize<IssueResponse>(reader);
+                        var response = (IssueResponse)s_serializer.ReadObject(content);
 
-                        return response.State;
+                        return response.GetStatus();
                     }
                 }
             }
@@ -69,9 +67,22 @@ namespace GitHubTracker
             }
         }
 
+        [DataContract]
         private class IssueResponse
         {
-            public IssueStatus State { get; set; }
+            [DataMember(Name = "state")]
+            public string State { get; set; }
+
+            public IssueStatus GetStatus()
+            {
+                IssueStatus status;
+                if (Enum.TryParse(State, true, out status))
+                {
+                    return status;
+                }
+
+                return default(IssueStatus);
+            }
         }
 
         private struct LimitHeaders
