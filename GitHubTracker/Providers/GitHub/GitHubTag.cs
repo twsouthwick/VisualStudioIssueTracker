@@ -1,14 +1,11 @@
 ﻿using Microsoft.VisualStudio.Text.Editor;
-using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace IssueTracker.Providers.GitHub
 {
-    internal class GitHubTag : IVersionControlTag, IGlyphTag
+    internal class GitHubTag : VersionControlTag, IVersionControlTag, IGlyphTag
     {
         private readonly IGitHubClient _client;
-        private Task<IssueStatus> _task;
 
         public GitHubTag(string organization, string repo, int issue, IGitHubClient client)
         {
@@ -17,11 +14,11 @@ namespace IssueTracker.Providers.GitHub
             Organization = organization;
             Repo = repo;
             Issue = issue;
+        }
 
-            _task = Task.Run(() =>
-            {
-                return _client.GetStatusAsync(organization, repo, issue);
-            });
+        protected override Task<IssueStatus> GetStatusAsync()
+        {
+            return _client.GetStatusAsync(Organization, Repo, Issue);
         }
 
         public string Organization { get; }
@@ -29,16 +26,5 @@ namespace IssueTracker.Providers.GitHub
         public string Repo { get; }
 
         public int Issue { get; }
-
-        public void Update(Action<IssueStatus> action)
-        {
-            Debug.Assert(action != null);
-
-            _task = _task.ContinueWith(t =>
-            {
-                action(t.Result);
-                return t.Result;
-            });
-        }
     }
 }

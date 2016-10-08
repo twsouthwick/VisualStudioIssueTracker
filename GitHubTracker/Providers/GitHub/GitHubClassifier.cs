@@ -31,9 +31,12 @@ namespace IssueTracker.Providers.GitHub
 
             foreach (Match match in matches)
             {
-                yield return new TagSpan<GitHubTag>(
-                    new SnapshotSpan(snapShot.Start + match.Index, match.Value.Length),
-                    new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value), _client));
+                var tag = new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value), _client);
+                var span = new SnapshotSpan(snapShot.Start + match.Index, match.Value.Length);
+
+                tag.Initialize();
+
+                yield return new TagSpan<GitHubTag>(span, tag);
             }
         }
     }

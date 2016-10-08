@@ -51,6 +51,7 @@
     <Compile Include="VersionControlGlyphFactoryProvider.cs" />
     <Compile Include="Providers\GitHub\GitHubHttpClient.cs" />
     <Compile Include="Providers\GitHub\GitHubTag.cs" />
+    <Compile Include="VersionControlTag.cs" />
     <Compile Include="VersionControlTagger.cs" />
     <Compile Include="VersionControlViewTaggerProvider.cs" />
     <Compile Include="Providers\GitHub\IGitHubClient.cs" />
