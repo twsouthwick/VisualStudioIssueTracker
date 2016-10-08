@@ -2,7 +2,13 @@
 
 namespace GitHubTracker
 {
-    public enum IssueStatus { Open, Closed, All };
+    public enum IssueStatus
+    {
+        Unavailable,
+        Open,
+        Closed,
+        RateLimited
+    };
 
     public interface IGitHubClient
     {

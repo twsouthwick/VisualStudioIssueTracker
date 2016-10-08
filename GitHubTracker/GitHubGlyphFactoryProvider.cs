@@ -54,23 +54,28 @@ namespace GitHubTracker
 
                 gitHubTag.Update(t =>
                 {
-                    switch (t)
+                    rectangle.Dispatcher.Invoke(() =>
                     {
-                        case IssueStatus.Closed:
-                            rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Green);
-                            break;
-                        case IssueStatus.Open:
-                            rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Red);
-                            break;
-                        case IssueStatus.All:
-                            rectangle.Dispatcher.Invoke(() => rectangle.Fill = Brushes.Blue);
-                            break;
-                    }
+                        switch (t)
+                        {
+                            case IssueStatus.Closed:
+                                rectangle.Fill = Brushes.Green;
+                                break;
+                            case IssueStatus.Open:
+                                rectangle.Fill = Brushes.Red;
+                                break;
+                            case IssueStatus.Unavailable:
+                                rectangle.Fill = Brushes.CadetBlue;
+                                break;
+                            case IssueStatus.RateLimited:
+                                rectangle.Fill = Brushes.AliceBlue;
+                                break;
+                        }
+                    });
                 });
 
                 return border;
             }
         }
     }
-
 }
