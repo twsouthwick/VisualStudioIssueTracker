@@ -15,13 +15,13 @@ namespace GitHubTracker
         private static readonly Regex s_regex = new Regex(@"GitHub\W+(\w+)/(\w+)\W+(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly ITextView _textView;
-        private readonly IClassifier _classifier;
+        private readonly ITagAggregator<IClassificationTag> _tags;
         private readonly IGitHubClient _client;
 
-        public GitHubTagger(ITextView textView, IClassifier classifier, IGitHubClient client)
+        public GitHubTagger(ITextView textView, ITagAggregator<IClassificationTag> tags, IGitHubClient client)
         {
             _textView = textView;
-            _classifier = classifier;
+            _tags = tags;
             _client = client;
         }
 
@@ -34,19 +34,21 @@ namespace GitHubTracker
 
             foreach (SnapshotSpan span in spans)
             {
-                var text = span.GetText();
-                //look at each classification span \
-                foreach (ClassificationSpan classification in _classifier.GetClassificationSpans(span))
+                foreach (var tag in _tags.GetTags(span))
                 {
-                    if (classification.ClassificationType.IsOfType(Comment))
+                    if (tag.Tag.ClassificationType.IsOfType(Comment))
                     {
-                        var matches = s_regex.Matches(classification.Span.GetText());
-
-                        foreach (Match match in matches)
+                        foreach (var snapShot in tag.Span.GetSpans(_textView.TextSnapshot))
                         {
-                            yield return new TagSpan<GitHubTag>(
-                                new SnapshotSpan(classification.Span.Start + match.Index, match.Value.Length),
-                                new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value), _client));
+                            var text = snapShot.GetText();
+                            var matches = s_regex.Matches(text);
+
+                            foreach (Match match in matches)
+                            {
+                                yield return new TagSpan<GitHubTag>(
+                                    new SnapshotSpan(snapShot.Start + match.Index, match.Value.Length),
+                                    new GitHubTag(match.Groups[1].Value, match.Groups[2].Value, Convert.ToInt32(match.Groups[3].Value), _client));
+                            }
                         }
                     }
                 }

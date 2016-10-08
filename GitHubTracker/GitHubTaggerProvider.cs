@@ -15,14 +15,14 @@ namespace GitHubTracker
     internal class GitHubViewTaggerProvider : IViewTaggerProvider
     {
         private readonly IGitHubClient _client;
-        private readonly IClassifierAggregatorService _aggregatorService;
+        private readonly IViewTagAggregatorFactoryService _tagAggregator;
 
         private readonly ConcurrentDictionary<ITextBuffer, GitHubTagger> _taggers = new ConcurrentDictionary<ITextBuffer, GitHubTagger>();
 
         [ImportingConstructor]
-        public GitHubViewTaggerProvider(IGitHubClient client, IClassifierAggregatorService aggregatorService)
+        public GitHubViewTaggerProvider(IGitHubClient client, IViewTagAggregatorFactoryService tagAggregator)
         {
-            _aggregatorService = aggregatorService;
+            _tagAggregator = tagAggregator;
             _client = client;
         }
 
@@ -33,7 +33,9 @@ namespace GitHubTracker
                 return null;
             }
 
-            return new GitHubTagger(textView, _aggregatorService.GetClassifier(buffer), _client) as ITagger<T>;
+            var tags = _tagAggregator.CreateTagAggregator<IClassificationTag>(textView);
+
+            return new GitHubTagger(textView, tags, _client) as ITagger<T>;
         }
     }
 }

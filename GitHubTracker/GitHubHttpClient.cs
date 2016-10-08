@@ -134,7 +134,6 @@ namespace GitHubTracker
                 }
                 else
                 {
-                    Debugger.Break();
                     return 0;
                 }
             }
@@ -149,7 +148,6 @@ namespace GitHubTracker
                 }
                 else
                 {
-                    Debugger.Break();
                     return string.Empty;
                 }
             }
