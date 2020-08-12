@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/lnhe17kmasdk56jx?svg=true)](https://ci.appveyor.com/project/twsouthwick/visualstudioissuetracker)
 
-Download this extension from the VS Gallery (Comming Soon)
+Download this extension from the VS Gallery (Coming Soon)
 or get the [CI build](http://vsixgallery.com/extension/IssueTrackerTaylor%20Southwick.2598c768-4628-4044-b4bf-e262116a3e3b/).
 
 ---------------------------------------
